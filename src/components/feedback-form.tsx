@@ -15,6 +15,7 @@ export function FeedbackForm() {
   const trimmed = useMemo(() => text.trim(), [text]);
   const remaining = MAX_FEEDBACK_LENGTH - text.length;
   const isOverLimit = remaining < 0;
+  const isLoading = state === "loading";
   const canSubmit =
     trimmed.length > 0 &&
     !isOverLimit &&
@@ -110,10 +111,10 @@ export function FeedbackForm() {
 
       <button
         type="submit"
-        disabled={!canSubmit || state === "loading"}
+        disabled={!canSubmit || isLoading}
         className="w-full rounded-xl bg-slate-900 px-4 py-3 text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
       >
-        {state === "loading" ? "Submitting..." : "Submit feedback"}
+        {isLoading ? "Submitting..." : "Submit feedback"}
       </button>
     </form>
   );

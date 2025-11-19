@@ -6,13 +6,13 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model Feedback {
-  id        Int        @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   text      String
   sentiment String
-  createdAt DateTime   @default(now())
+  createdAt DateTime @default(now())
 }

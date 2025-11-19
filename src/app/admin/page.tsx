@@ -45,7 +45,10 @@ export default async function AdminPage() {
   };
 
   grouped.forEach((group) => {
-    counts[group.sentiment] = group._count._all;
+    const sentimentKey = group.sentiment as Sentiment;
+    if (sentimentKey in counts) {
+      counts[sentimentKey] = group._count._all;
+    }
   });
 
   return (

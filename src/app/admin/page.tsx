@@ -1,10 +1,13 @@
 // src/app/admin/page.tsx
-import prisma from "@/lib/prisma";
+import Link from "next/link";
+
 import { FeedbackTable } from "@/components/feedback-table";
 import { RefreshButton } from "@/components/refresh-button";
+import prisma from "@/lib/prisma";
 
 const SENTIMENT_ORDER = ["Good", "Neutral", "Bad"] as const;
 type Sentiment = (typeof SENTIMENT_ORDER)[number];
+const PAGE_SIZE = 10;
 
 const SENTIMENT_META: Record<
   Sentiment,
@@ -27,16 +30,35 @@ const SENTIMENT_META: Record<
   },
 };
 
-export default async function AdminPage() {
-  const [entries, grouped] = await Promise.all([
-    prisma.feedback.findMany({
-      orderBy: { createdAt: "desc" },
-    }),
+type PageProps = {
+  searchParams?: {
+    page?: string;
+  };
+};
+
+export default async function AdminPage({ searchParams }: PageProps) {
+  const resolvedSearchParams = await searchParams;
+  const requestedPage = Number(resolvedSearchParams?.page ?? "1");
+  const currentPage =
+    Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+
+  const [grouped, totalCount] = await Promise.all([
     prisma.feedback.groupBy({
       by: ["sentiment"],
       _count: { _all: true },
     }),
+    prisma.feedback.count(),
   ]);
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  const page = Math.min(currentPage, totalPages);
+  const skip = (page - 1) * PAGE_SIZE;
+
+  const entries = await prisma.feedback.findMany({
+    orderBy: { createdAt: "desc" },
+    skip,
+    take: PAGE_SIZE,
+  });
 
   const counts: Record<Sentiment, number> = {
     Good: 0,
@@ -83,6 +105,16 @@ export default async function AdminPage() {
         </section>
 
         <FeedbackTable entries={entries} />
+
+        {totalPages > 1 && (
+          <PaginationControls
+            currentPage={page}
+            totalPages={totalPages}
+            pageSize={PAGE_SIZE}
+            totalEntries={totalCount}
+            currentCount={entries.length}
+          />
+        )}
       </div>
     </div>
   );
@@ -101,6 +133,70 @@ function StatCard({ title, subtitle, value, accentClass }: StatCardProps) {
       <p className={`text-sm font-medium ${accentClass}`}>{subtitle}</p>
       <p className="mt-1 text-lg font-semibold text-slate-900">{title}</p>
       <p className="mt-4 text-3xl font-semibold">{value}</p>
+    </div>
+  );
+}
+
+type PaginationProps = {
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+  totalEntries: number;
+  currentCount: number;
+};
+
+function PaginationControls({
+  currentPage,
+  totalPages,
+  pageSize,
+  totalEntries,
+  currentCount,
+}: PaginationProps) {
+  const start = totalEntries === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const end = (currentPage - 1) * pageSize + currentCount;
+  const hasPrev = currentPage > 1;
+  const hasNext = currentPage < totalPages;
+
+  const linkForPage = (page: number) =>
+    page === 1 ? "/admin" : `/admin?page=${page}`;
+
+  return (
+    <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-6 py-4 text-sm text-slate-600 shadow-sm sm:flex-row">
+      <p>
+        Showing <span className="font-semibold text-slate-900">{start}</span>-
+        <span className="font-semibold text-slate-900">{end}</span> of{" "}
+        <span className="font-semibold text-slate-900">{totalEntries}</span>{" "}
+        feedback entries
+      </p>
+      <div className="flex items-center gap-3">
+        {hasPrev ? (
+          <Link
+            href={linkForPage(currentPage - 1)}
+            className="rounded-lg border border-slate-200 px-3 py-2 font-medium text-slate-900 transition hover:bg-slate-50"
+          >
+            Previous
+          </Link>
+        ) : (
+          <span className="rounded-lg border border-slate-100 px-3 py-2 font-medium text-slate-400">
+            Previous
+          </span>
+        )}
+        <span className="text-slate-500">
+          Page {currentPage} / {totalPages}
+        </span>
+        {hasNext ? (
+          <Link
+            href={linkForPage(currentPage + 1)}
+            className="rounded-lg border border-slate-200 px-3 py-2 font-medium text-slate-900 transition hover:bg-slate-50"
+          >
+            Next
+          </Link>
+        ) : (
+          <span className="rounded-lg border border-slate-100 px-3 py-2 font-medium text-slate-400">
+            Next
+          </span>
+        )}
+      </div>
     </div>
   );
 }

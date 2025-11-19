@@ -1,6 +1,8 @@
 // src/components/feedback-table.tsx
 import { Feedback } from "@prisma/client";
 
+import { DeleteFeedbackButton } from "./delete-feedback-button";
+
 type Props = {
   entries: Feedback[];
 };
@@ -27,6 +29,7 @@ export function FeedbackTable({ entries }: Props) {
             <th className="px-6 py-4">Feedback</th>
             <th className="px-6 py-4">Sentiment</th>
             <th className="px-6 py-4">Submitted</th>
+            <th className="px-6 py-4 text-right">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -50,6 +53,9 @@ export function FeedbackTable({ entries }: Props) {
               </td>
               <td className="px-6 py-4 text-slate-500">
                 {dateFormatter.format(new Date(entry.createdAt))}
+              </td>
+              <td className="px-6 py-4 text-right">
+                <DeleteFeedbackButton id={entry.id} />
               </td>
             </tr>
           ))}

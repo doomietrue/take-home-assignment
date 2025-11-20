@@ -5,14 +5,16 @@
   "scripts": {
     "dev": "next dev",
     "generate": "prisma generate",
-    "build": "prisma generate && prisma db push && next build",
+    "prepare:db": "prisma db push",
+    "setup": "npm run generate && npm run prepare:db",
     "start": "next start",
+    "build": "npm run setup && next build",
     "lint": "eslint"
   },
   "dependencies": {
-    "@prisma/client": "^6.19.0",
+    "@prisma/client": "^7.0.0",
     "next": "16.0.3",
-    "prisma": "^6.19.0",
+    "prisma": "^7.0.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "sentiment": "^5.0.2",

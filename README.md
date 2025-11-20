@@ -21,6 +21,19 @@ Open `http://localhost:3000` for the public form and `http://localhost:3000/admi
 ### Environment
 Copy `.env.example` to `.env` and replace `REPLACE_WITH_PASSWORD` with the actual Neon password I shared privately.
 
+### Admin Credentials
+Run `npm run seed` once to insert demo users. The default accounts are:
+
+- `admin@demo.com` / `admin123` (can delete feedback)
+- `reviewer@demo.com` / `reviewer123` (read-only access)
+
+### Testing
+Unit tests cover the critical auth helpers. Run them with:
+
+```bash
+npm run test
+```
+
 ### Tech Stack
 - Next.js 16 (App Router, TypeScript)
 - Tailwind CSS via `@tailwindcss/postcss`

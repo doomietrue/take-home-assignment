@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 
 import prisma from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 
 type RouteParams = {
   params: Promise<{
@@ -15,6 +16,18 @@ export async function DELETE(_: Request, context: RouteParams) {
 
   if (!Number.isInteger(id) || id <= 0) {
     return NextResponse.json({ error: "Invalid feedback id." }, { status: 400 });
+  }
+
+  const currentUser = await getCurrentUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
+  if (currentUser.role !== "ADMIN") {
+    return NextResponse.json(
+      { error: "You do not have permission to delete feedback." },
+      { status: 403 },
+    );
   }
 
   try {

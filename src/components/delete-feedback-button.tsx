@@ -40,7 +40,7 @@ export function DeleteFeedbackButton({ id }: Props) {
     <button
       type="button"
       onClick={handleDelete}
-      className="text-sm font-medium text-rose-600 hover:text-rose-500 disabled:cursor-not-allowed disabled:opacity-60"
+      className="text-sm font-medium text-rose-600 hover:text-rose-500 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
       disabled={isPending}
     >
       {isPending ? "Deleting..." : "Delete"}

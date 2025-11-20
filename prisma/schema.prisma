@@ -16,3 +16,25 @@ model Feedback {
   sentiment String
   createdAt DateTime @default(now())
 }
+
+enum Role {
+  ADMIN
+  REVIEWER
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String
+  role         Role      @default(REVIEWER)
+  createdAt    DateTime  @default(now())
+  sessions     Session[]
+}
+
+model Session {
+  token     String   @id
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}

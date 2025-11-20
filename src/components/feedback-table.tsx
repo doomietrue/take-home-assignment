@@ -5,6 +5,7 @@ import { DeleteFeedbackButton } from "./delete-feedback-button";
 
 type Props = {
   entries: Feedback[];
+  canDelete?: boolean;
 };
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -12,7 +13,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
   timeStyle: "short",
 });
 
-export function FeedbackTable({ entries }: Props) {
+export function FeedbackTable({ entries, canDelete = false }: Props) {
   if (entries.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-12 text-center text-slate-500">
@@ -29,7 +30,7 @@ export function FeedbackTable({ entries }: Props) {
             <th className="px-6 py-4">Feedback</th>
             <th className="px-6 py-4">Sentiment</th>
             <th className="px-6 py-4">Submitted</th>
-            <th className="px-6 py-4 text-right">Actions</th>
+            {canDelete && <th className="px-6 py-4 text-right">Actions</th>}
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -54,9 +55,11 @@ export function FeedbackTable({ entries }: Props) {
               <td className="px-6 py-4 text-slate-500">
                 {dateFormatter.format(new Date(entry.createdAt))}
               </td>
-              <td className="px-6 py-4 text-right">
-                <DeleteFeedbackButton id={entry.id} />
-              </td>
+              {canDelete && (
+                <td className="px-6 py-4 text-right">
+                  <DeleteFeedbackButton id={entry.id} />
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

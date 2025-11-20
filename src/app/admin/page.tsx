@@ -1,8 +1,11 @@
 // src/app/admin/page.tsx
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { FeedbackTable } from "@/components/feedback-table";
+import { LogoutButton } from "@/components/logout-button";
 import { RefreshButton } from "@/components/refresh-button";
+import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
 const SENTIMENT_ORDER = ["Good", "Neutral", "Bad"] as const;
@@ -37,6 +40,13 @@ type PageProps = {
 };
 
 export default async function AdminPage({ searchParams }: PageProps) {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/login");
+  }
+
+  const canDelete = user.role === "ADMIN";
+
   const resolvedSearchParams = await searchParams;
   const requestedPage = Number(resolvedSearchParams?.page ?? "1");
   const currentPage =
@@ -89,8 +99,25 @@ export default async function AdminPage({ searchParams }: PageProps) {
               on demand.
             </p>
           </div>
-          <RefreshButton />
+          <div className="flex flex-col items-end gap-2">
+            <div className="text-right text-sm text-slate-500">
+              Signed in as{" "}
+              <span className="font-semibold text-slate-900">{user.email}</span>{" "}
+              ({user.role})
+            </div>
+            <div className="flex items-center gap-3">
+              <RefreshButton />
+              <LogoutButton />
+            </div>
+          </div>
         </section>
+
+        {!canDelete && (
+          <div className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            You have read-only access. Feedback deletion requires an admin
+            account.
+          </div>
+        )}
 
         <section className="grid gap-4 sm:grid-cols-3">
           {SENTIMENT_ORDER.map((sentiment) => (
@@ -104,7 +131,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
           ))}
         </section>
 
-        <FeedbackTable entries={entries} />
+        <FeedbackTable entries={entries} canDelete={canDelete} />
 
         {totalPages > 1 && (
           <PaginationControls

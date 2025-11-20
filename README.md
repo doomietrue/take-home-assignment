@@ -11,7 +11,7 @@ This repository hosts a proof-of-concept customer feedback workflow built with N
 ### Getting Started
 ```bash
 npm install
-cp .env.example .env.local   # replace password with the one I shared
+cp .env.example .env   # replace password with the one I shared
 npm run setup                # prisma generate + db push
 npm run dev                  # start the Next.js dev server
 ```
@@ -19,7 +19,7 @@ npm run dev                  # start the Next.js dev server
 Open `http://localhost:3000` for the public form and `http://localhost:3000/admin` for the dashboard.
 
 ### Environment
-Copy `.env.example` to `.env.local` (or configure the same values in Vercel) and replace `REPLACE_WITH_PASSWORD` with the actual Neon password I shared privately. Never commit this file.
+Copy `.env.example` to `.env` and replace `REPLACE_WITH_PASSWORD` with the actual Neon password I shared privately.
 
 ### Tech Stack
 - Next.js 16 (App Router, TypeScript)

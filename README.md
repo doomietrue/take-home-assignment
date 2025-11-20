@@ -18,14 +18,13 @@ npm run dev
 Open `http://localhost:3000` for the public form and `http://localhost:3000/admin` for the dashboard.
 
 ### Environment
-Copy `.env` to `.env.local` (or set environment variables in Vercel) and provide your Neon connection string:
+Create a `.env.local` file (or configure the variables in Vercel) and paste the credentials that I shared with you privately. At minimum you need:
 
 ```
-DATABASE_URL="postgresql://user:password@host/neondb?sslmode=require"
+DATABASE_URL="postgresql://<user>:<password>@<host>/<db>?sslmode=require"
 ```
 
-### Prisma/Next.js compatibility
-This project pins Prisma ORM to the latest 5.x release because Prisma 7’s new “client” engine requires database adapters that aren’t yet available for SQLite. Prisma 5 uses the mature binary engine and works seamlessly with Next.js 16.
+If I provided extra `NEON_*` keys, add them to `.env.local` as well—they are optional but handy for tooling. Never commit this file.
 
 ### Tech Stack
 - Next.js 16 (App Router, TypeScript)
